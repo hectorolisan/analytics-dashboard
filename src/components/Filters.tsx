@@ -12,7 +12,7 @@ type SelectProps<T extends string> = {
   onChange: (v: T) => void
 }
 
-function Select<T extends string>({ label, value, options, onChange }: SelectProps<T>) {
+export function Select<T extends string>({ label, value, options, onChange }: SelectProps<T>) {
   return (
     <label className="relative">
       <span className="sr-only">{label}</span>

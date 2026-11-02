@@ -4,6 +4,7 @@ import { compact, formatDate, formatEnergy, formatPct } from '../lib/format'
 import { byYear, mixShares, renewableShare } from '../lib/metrics'
 import { ChartTooltip } from './ChartTooltip'
 import { SourceLegend } from './SourceLegend'
+import { YearCompare } from './YearCompare'
 
 const axis = { tickLine: false, tick: { fill: 'var(--muted-foreground)', fontSize: 11 } } as const
 
@@ -99,6 +100,8 @@ export function Evolution({ days }: { days: Day[] }) {
         </BarChart>
         {partial && <p className="mt-3 text-xs text-muted-foreground">* Año en curso, datos hasta el {formatDate(last, 'long')}.</p>}
       </section>
+
+      <YearCompare days={days} />
     </div>
   )
 }

@@ -21,3 +21,14 @@ const dLong = new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'short',
 
 export const formatDate = (iso: string, style: 'short' | 'month' | 'long' = 'short') =>
   (style === 'short' ? dShort : style === 'month' ? dMonth : dLong).format(new Date(iso))
+
+export type Metric = 'demand' | 'renewable'
+
+export const METRICS: { key: Metric; label: string; format: (v: number) => string }[] = [
+  { key: 'demand', label: 'Demanda media', format: (v) => `${formatEnergy(v)}/día` },
+  { key: 'renewable', label: 'Cuota renovable', format: formatPct },
+]
+
+export const MONTHS = Array.from({ length: 12 }, (_, m) =>
+  new Intl.DateTimeFormat('es-ES', { month: 'short', timeZone: 'UTC' }).format(new Date(Date.UTC(2000, m, 1))),
+)

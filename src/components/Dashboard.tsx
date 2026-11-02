@@ -1,4 +1,5 @@
 import type { Day } from '../lib/data'
+import { eventMarks } from '../lib/events'
 import { formatDate, formatEnergy, formatPct, formatPower, formatSigned } from '../lib/format'
 import {
   bucketize,
@@ -27,6 +28,8 @@ export function Dashboard({ days, period, sourceFilter }: Props) {
   const prev = combine(previous)
   const buckets = bucketize(current, bucket)
   const prevBuckets = bucketize(previous, bucket)
+
+  const marks = eventMarks(buckets.map((d) => d.date), current.at(-1)!.date)
 
   const share = renewableShare(curr)
   const shareDiff = share - renewableShare(prev)
@@ -73,8 +76,8 @@ export function Dashboard({ days, period, sourceFilter }: Props) {
           spark={buckets.map((d) => -d.exchange)}
         />
       </div>
-      <DemandChart current={buckets} previous={prevBuckets} total={formatEnergy(curr.demand)} bucket={bucket} />
-      <MixChart days={buckets} sources={visibleSources(sourceFilter)} bucket={bucket} />
+      <DemandChart current={buckets} previous={prevBuckets} total={formatEnergy(curr.demand)} bucket={bucket} marks={marks} />
+      <MixChart days={buckets} sources={visibleSources(sourceFilter)} bucket={bucket} marks={marks} />
       <SourcesTable rows={sourceRows(current, previous, sourceFilter)} />
     </div>
   )

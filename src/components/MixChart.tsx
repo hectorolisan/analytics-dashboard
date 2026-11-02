@@ -1,13 +1,15 @@
 import { Area, AreaChart, CartesianGrid, Tooltip, XAxis, YAxis } from 'recharts'
 import { sourceColor, type Day } from '../lib/data'
+import type { EventMark } from '../lib/events'
 import { bucketLabel, compact, formatDate, formatEnergy } from '../lib/format'
 import type { visibleSources } from '../lib/metrics'
 import { ChartTooltip } from './ChartTooltip'
+import { eventLines } from './EventLines'
 import { SourceLegend } from './SourceLegend'
 
-type Props = { days: Day[]; sources: ReturnType<typeof visibleSources>; bucket: number }
+type Props = { days: Day[]; sources: ReturnType<typeof visibleSources>; bucket: number; marks: EventMark[] }
 
-export function MixChart({ days, sources, bucket }: Props) {
+export function MixChart({ days, sources, bucket, marks }: Props) {
   // shortcut: hidráulica neta < 0 (bombeo) se apila como 0; el valor real está en la tabla
   const rows = days.map((d) => ({ ...d, hydro: Math.max(0, d.hydro) }))
 
@@ -52,6 +54,7 @@ export function MixChart({ days, sources, bucket }: Props) {
             animationDuration={900}
           />
         ))}
+        {eventLines(marks)}
       </AreaChart>
       <SourceLegend sources={sources} />
     </section>

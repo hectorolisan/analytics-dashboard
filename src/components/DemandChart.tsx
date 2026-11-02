@@ -2,13 +2,15 @@ import { useId } from 'react'
 import { Area, AreaChart, CartesianGrid, Line, Tooltip, XAxis, YAxis } from 'recharts'
 import { bucketLabel, compact, formatDate, formatEnergy } from '../lib/format'
 import type { Day } from '../lib/data'
+import type { EventMark } from '../lib/events'
 import { ChartTooltip } from './ChartTooltip'
+import { eventLines } from './EventLines'
 
 type Row = { date: string; prevDate?: string; current: number; previous?: number }
 
-type Props = { current: Day[]; previous: Day[]; total: string; bucket: number }
+type Props = { current: Day[]; previous: Day[]; total: string; bucket: number; marks: EventMark[] }
 
-export function DemandChart({ current, previous, total, bucket }: Props) {
+export function DemandChart({ current, previous, total, bucket, marks }: Props) {
   const id = useId()
   const rows: Row[] = current.map((d, i) => ({
     date: d.date,
@@ -91,6 +93,7 @@ export function DemandChart({ current, previous, total, bucket }: Props) {
           activeDot={{ r: 4, stroke: 'var(--card)', strokeWidth: 2 }}
           animationDuration={900}
         />
+        {eventLines(marks)}
       </AreaChart>
     </section>
   )
