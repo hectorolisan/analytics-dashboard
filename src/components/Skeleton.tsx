@@ -2,6 +2,19 @@ export function Skeleton({ className = '' }: { className?: string }) {
   return <div className={`animate-pulse rounded-md bg-muted ${className}`} />
 }
 
+export function ChartsSkeleton() {
+  return (
+    <div aria-busy="true" aria-label="Cargando datos" className="grid gap-4 lg:grid-cols-2">
+      {Array.from({ length: 2 }, (_, i) => (
+        <div key={i} className="card space-y-4 p-5">
+          <Skeleton className="h-5 w-48" />
+          <Skeleton className="h-72 w-full" />
+        </div>
+      ))}
+    </div>
+  )
+}
+
 export function DashboardSkeleton() {
   return (
     <div aria-busy="true" aria-label="Cargando datos" className="space-y-4">

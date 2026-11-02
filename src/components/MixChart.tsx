@@ -11,7 +11,7 @@ export function MixChart({ days, sources, bucket }: Props) {
   const rows = days.map((d) => ({ ...d, hydro: Math.max(0, d.hydro) }))
 
   return (
-    <section id="mix" className="card scroll-mt-20 p-5">
+    <section className="card p-5">
       <header className="mb-4">
         <h2 className="text-lg">Mix de generación</h2>
         <p className="text-xs text-muted-foreground">GWh por {bucketLabel(bucket)}, apilado por fuente</p>

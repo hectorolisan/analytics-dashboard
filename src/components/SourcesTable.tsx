@@ -62,7 +62,7 @@ export function SourcesTable({ rows }: { rows: SourceRow[] }) {
   })
 
   return (
-    <section id="fuentes" className="card scroll-mt-20 overflow-hidden">
+    <section className="card overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <caption className="sr-only">Generación por fuente en el periodo seleccionado</caption>

@@ -19,7 +19,7 @@ export function DemandChart({ current, previous, total, bucket }: Props) {
   const tick = (iso: string) => formatDate(iso, bucket >= 28 ? 'month' : 'short')
 
   return (
-    <section id="demanda" className="card scroll-mt-20 p-5">
+    <section className="card p-5">
       <header className="mb-4 flex flex-wrap items-center gap-x-5 gap-y-2">
         <div>
           <h2 className="text-lg">Demanda en el tiempo</h2>
