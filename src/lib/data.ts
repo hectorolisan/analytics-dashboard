@@ -19,7 +19,7 @@ export type Day = { date: string; demand: number; peak: number; exchange: number
 
 type Columnar = { [K in keyof Day]: Day[K][] }
 
-export async function loadDays(url = '/data/ree-daily.json'): Promise<Day[]> {
+export async function loadDays(url = `${import.meta.env.BASE_URL}data/ree-daily.json`): Promise<Day[]> {
   const res = await fetch(url)
   if (!res.ok) throw new Error(`No se pudo cargar ${url} (${res.status})`)
   const cols: Columnar = await res.json()

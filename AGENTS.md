@@ -20,6 +20,11 @@ pnpm is the package manager (`pnpm-lock.yaml` is committed; npm/bun also work).
 - `pnpm lint` — Oxlint (`.oxlintrc.json`)
 - `pnpm test` — Vitest (`vitest run`; config lives in `vite.config.ts`, `environment: 'jsdom'`)
 
+Deploy: `.github/workflows/deploy.yml` publishes `./dist/` to GitHub Pages on every push to `main`
+(lint + test first). Vite's `base` comes from `PAGES_BASE_PATH` (`/analytics-dashboard` in CI,
+empty locally), so build asset and data URLs from `import.meta.env.BASE_URL`, never hardcode `/…`.
+`packageManager` in `package.json` pins the pnpm version CI uses.
+
 Dataset: `python scripts/build_dataset.py` inside a `.venv` (`requirements.txt`: DuckDB). It
 downloads the Parquet files of [`daniel-dona/ree-data`](https://huggingface.co/datasets/daniel-dona/ree-data)
 (CC BY 4.0, REE open data) into `data/raw/` (git-ignored) and writes `public/data/ree-daily.json`.

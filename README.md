@@ -11,6 +11,8 @@ Dense data at a glance: KPI row with sparklines, animated charts, filters, sorta
 - **Vitest** + **Testing Library** — unit and component tests.
 - **pnpm** — package manager.
 
+> Live demo: [hectorolisan.github.io/analytics-dashboard](https://hectorolisan.github.io/analytics-dashboard/)
+
 ![cover](./public/cover.webp)
 
 ## Screens
@@ -91,7 +93,7 @@ Dense data at a glance: KPI row with sparklines, animated charts, filters, sorta
 | :------------- | :---------------------------------------- |
 | `pnpm install` | Install all dependencies                  |
 | `pnpm dev`     | Start dev server at `localhost:5173`      |
-| `pnpm build`   | Type-check and build into `./dist/`       |
+| `pnpm build`   | Type-check and build into `./dist/`, deployed to GitHub Pages on push to `main` |
 | `pnpm preview` | Preview the production build              |
 | `pnpm lint`    | Run Oxlint                                |
 | `pnpm test`    | Run Vitest                                |
