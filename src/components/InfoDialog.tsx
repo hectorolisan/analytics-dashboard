@@ -22,9 +22,9 @@ export function InfoButton({ className = '' }: { className?: string }) {
         aria-labelledby="info-title"
         // clic en el fondo cierra
         onClick={(e) => e.target === e.currentTarget && e.currentTarget.close()}
-        className="card m-auto max-h-[85dvh] w-[min(36rem,calc(100%-2rem))] overflow-y-auto p-0 text-foreground backdrop:bg-black/50 backdrop:backdrop-blur-sm"
+        className="card m-auto max-h-[85dvh] w-[min(40rem,calc(100%-2rem))] flex-col overflow-hidden p-0 text-foreground backdrop:bg-black/50 backdrop:backdrop-blur-sm open:flex"
       >
-        <div className="space-y-5 p-6 text-sm leading-relaxed">
+        <div className="min-h-0 flex-1 space-y-5 overflow-y-auto p-6 text-sm leading-relaxed">
           <header className="flex items-start gap-3">
             <div className="mr-auto">
               <p className="text-[11px] font-semibold tracking-[0.3em] text-muted-foreground uppercase">Sobre los datos</p>
@@ -90,11 +90,10 @@ export function InfoButton({ className = '' }: { className?: string }) {
               <li>En REE el saldo internacional negativo es exportación (comprobado con el balance generación − demanda).</li>
             </ul>
           </Block>
-
-          <footer className="border-t pt-4">
-            <Credit />
-          </footer>
         </div>
+        <footer className="border-t px-6 py-4">
+          <Credit />
+        </footer>
       </dialog>
     </>
   )
