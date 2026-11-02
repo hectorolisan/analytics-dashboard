@@ -65,3 +65,14 @@ test('funciona sin conexión tras la primera visita', async ({ page, context }) 
   await page.reload()
   await expect(page.getByRole('heading', { name: 'Demanda en el tiempo' })).toBeVisible()
 })
+
+test('el dialog de datos bloquea el scroll del fondo', async ({ page }) => {
+  await page.goto('/')
+  await expect(page.getByRole('heading', { name: 'Demanda en el tiempo' })).toBeVisible()
+  await page.getByRole('button', { name: 'Sobre los datos' }).click()
+  await expect(page.getByRole('dialog')).toBeVisible()
+  expect(await page.evaluate(() => getComputedStyle(document.documentElement).overflow)).toBe('hidden')
+
+  await page.getByRole('dialog').getByRole('button', { name: 'Cerrar' }).click()
+  expect(await page.evaluate(() => getComputedStyle(document.documentElement).overflow)).toBe('visible')
+})
