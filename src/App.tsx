@@ -1,6 +1,7 @@
 import { Suspense, use } from 'react'
 import { Sidebar } from './components/Sidebar'
 import { DashboardSkeleton } from './components/Skeleton'
+import { ThemeControls } from './components/ThemeControls'
 import { loadDays, type Day } from './lib/data'
 
 const daysPromise: Promise<Day[] | Error> = loadDays().catch((e: Error) => e)
@@ -15,6 +16,7 @@ export default function App() {
             <h1 className="text-xl">Resumen</h1>
             <p className="text-xs text-muted-foreground">Red Eléctrica · Sistema peninsular</p>
           </div>
+          <ThemeControls />
         </header>
         <main id="resumen" className="mx-auto max-w-7xl p-4 sm:p-6">
           <Suspense fallback={<DashboardSkeleton />}>
