@@ -1,7 +1,4 @@
-import { Suspense, use, type ReactNode } from 'react'
-import { Dashboard } from './components/Dashboard'
-import { Evolution } from './components/Evolution'
-import { Seasonality } from './components/Seasonality'
+import { lazy, Suspense, use, type ReactNode } from 'react'
 import { ExportButton, Filters, YearRange } from './components/Filters'
 import { OpenSidebarButton, Sidebar } from './components/Sidebar'
 import { ChartsSkeleton, DashboardSkeleton, Skeleton } from './components/Skeleton'
@@ -10,6 +7,10 @@ import { loadDays, type Day } from './lib/data'
 import { inYears, parsePeriod, SOURCE_FILTERS } from './lib/metrics'
 import { hashParams, parseRoute, SCREENS, setParams, useHash } from './lib/route'
 import { useSidebar } from './lib/sidebar'
+
+const Dashboard = lazy(() => import('./components/Dashboard').then((m) => ({ default: m.Dashboard })))
+const Evolution = lazy(() => import('./components/Evolution').then((m) => ({ default: m.Evolution })))
+const Seasonality = lazy(() => import('./components/Seasonality').then((m) => ({ default: m.Seasonality })))
 
 const daysPromise: Promise<Day[] | Error> = loadDays().catch((e: Error) => e)
 
