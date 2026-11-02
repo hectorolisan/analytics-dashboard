@@ -34,6 +34,7 @@ Dense data at a glance: KPI row with sparklines, animated charts, filters, sorta
   - Before 2015 REE groups solar thermal, biomass and cogeneration as _régimen especial_, so the renewable share for those years is underestimated.
 
 > Data: © Red Eléctrica de España, via [`daniel-dona/ree-data`](https://huggingface.co/datasets/daniel-dona/ree-data) (CC BY 4.0). Aggregated daily; no other changes.
+> The source code is under the [MIT License](./LICENSE); the data keeps its CC BY 4.0 license.
 
 ## Project Structure
 
@@ -75,7 +76,9 @@ Dense data at a glance: KPI row with sparklines, animated charts, filters, sorta
 │   ├── App.tsx
 │   ├── index.css               # Tailwind + design tokens
 │   └── main.tsx
+├── AGENTS.md
 ├── index.html
+├── LICENSE
 ├── package.json
 ├── requirements.txt            # Python deps for the dataset script
 ├── vite.config.ts
