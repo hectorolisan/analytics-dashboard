@@ -25,13 +25,18 @@ pnpm is the package manager (`pnpm-lock.yaml` is committed; npm/bun also work).
 
 CI: `ci.yml` runs lint, Vitest and Playwright on pushes and PRs. `deploy.yml` publishes `./dist/` to
 GitHub Pages after a successful `CI` or `Data refresh` run on `main` (`workflow_run`, since pushes made
-with `GITHUB_TOKEN` start no workflows). `data.yml` rebuilds the dataset monthly and commits it. Vite's `base` comes from `PAGES_BASE_PATH` (`/analytics-dashboard` in CI,
+with `GITHUB_TOKEN` start no workflows). `data.yml` appends new days every Monday and commits them. Vite's `base` comes from `PAGES_BASE_PATH` (`/analytics-dashboard` in CI,
 empty locally), so build asset and data URLs from `import.meta.env.BASE_URL`, never hardcode `/…`.
 `packageManager` in `package.json` pins the pnpm version CI uses.
 
-Dataset: `python scripts/build_dataset.py` inside a `.venv` (`requirements.txt`: DuckDB). It
+Dataset: `python scripts/build_dataset.py` inside a `.venv`. With `--full` (or no JSON yet) it
 downloads the Parquet files of [`daniel-dona/ree-data`](https://huggingface.co/datasets/daniel-dona/ree-data)
-(CC BY 4.0, REE open data) into `data/raw/` (git-ignored) and writes `public/data/ree-daily.json`.
+(CC BY 4.0, REE open data, frozen at 2026-05-13) into `data/raw/` (git-ignored) and aggregates them
+with DuckDB (`requirements.txt`). It then always appends the missing days up to yesterday from
+`demanda.ree.es` (undocumented REE endpoint, same 5-min columns; stdlib only), after checking that
+the last stored day still aggregates to the same values. That API returns `bio` instead of
+`termRenov` and its `aut` breaks the generation − demand balance, so `other` skips it; it also
+returns empty lists at random, hence the retries. Writes `public/data/ree-daily.json`.
 Never edit that JSON by hand; `src/lib/dataset.test.ts` checks column lengths and consecutive dates.
 
 ## Architecture

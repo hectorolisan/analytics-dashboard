@@ -44,8 +44,8 @@ export function InfoButton({ className = '', labelClassName = '' }: { className?
           </header>
 
           <p>
-            Demanda y generación eléctrica por tecnología de la península ibérica española, del 1 ene 2008 al 13 may 2026,
-            publicadas por Red Eléctrica (REE) como datos abiertos.
+            Demanda y generación eléctrica por tecnología de la península ibérica española desde el 1 ene 2008, publicadas por
+            Red Eléctrica (REE) como datos abiertos y actualizadas cada semana.
           </p>
 
           <Block title="Origen">
@@ -64,8 +64,9 @@ export function InfoButton({ className = '', labelClassName = '' }: { className?
                   Red Eléctrica
                   <ExternalLink className="size-3" aria-hidden />
                 </a>
-                : 1.931.443 registros en MW cada 5 minutos.
+                : 1.931.443 registros en MW cada 5 minutos hasta el 13 may 2026.
               </li>
+              <li>Desde el 14 may 2026, la misma serie de 5 minutos directamente de la API de demanda de REE.</li>
             </ul>
           </Block>
 

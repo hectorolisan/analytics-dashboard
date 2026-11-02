@@ -2,7 +2,8 @@ name: Data refresh
 
 on:
   schedule:
-    - cron: '0 5 1 * *'
+    # mondays: last week's days are closed by then
+    - cron: '0 5 * * 1'
   workflow_dispatch:
 
 permissions:
@@ -16,8 +17,7 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: '3.13'
-          cache: pip
-      - run: pip install -r requirements.txt
+      # stdlib only; DuckDB is needed just for a --full rebuild
       - run: python scripts/build_dataset.py
       - name: Commit dataset if it changed
         run: |

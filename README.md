@@ -36,13 +36,14 @@ Dense data at a glance: KPI row with sparklines, animated charts, shareable filt
 
 - **Source:** open data from [Red Eléctrica de España (REE)](https://www.ree.es/), collected from its API.
 - **Content:** 1,931,443 records at 5-minute resolution (MW): demand, generation by technology (wind, solar, hydro, nuclear, combined cycle, coal, cogeneration…) and international exchanges.
-- **Processing:** `scripts/build_dataset.py` downloads the Parquet files and aggregates them with DuckDB into `public/data/ree-daily.json` (6,708 days, 2008-01-01 → 2026-05-13): mean MW × 24 h = GWh/day, daily peak in MW.
+- **Processing:** `scripts/build_dataset.py` aggregates the Parquet files with DuckDB into `public/data/ree-daily.json`: mean MW × 24 h = GWh/day, daily peak in MW.
+- **Updates:** the Hugging Face snapshot stops on 2026-05-13. Later days come from the same 5-minute series in REE's demand API (`demanda.ree.es`, the source of the dataset), aggregated the same way. Before appending, the script re-fetches the last stored day and fails if it no longer matches.
 - **Notes:**
   - Hydro is net generation, so it can be negative on pumping days.
   - A negative REE exchange balance means net export (checked against generation − demand).
   - Before 2015 REE groups solar thermal, biomass and cogeneration as _régimen especial_, so the renewable share for those years is underestimated.
 
-> Data: © Red Eléctrica de España, via [`daniel-dona/ree-data`](https://huggingface.co/datasets/daniel-dona/ree-data) (CC BY 4.0). Aggregated daily; no other changes.
+> Data: © Red Eléctrica de España, via [`daniel-dona/ree-data`](https://huggingface.co/datasets/daniel-dona/ree-data) (CC BY 4.0) and REE's demand API. Aggregated daily; no other changes.
 > The source code is under the [MIT License](./LICENSE); the data keeps its CC BY 4.0 license.
 
 ## Project Structure
@@ -121,9 +122,10 @@ python -m venv .venv
 .venv\Scripts\activate        # Windows
 source .venv/bin/activate     # Linux/macOS
 pip install -r requirements.txt
-python scripts/build_dataset.py
+python scripts/build_dataset.py          # appends new days from REE (stdlib only)
+python scripts/build_dataset.py --full   # rebuilds the history from Hugging Face (needs DuckDB)
 ```
 
-The `Data refresh` workflow runs this monthly (or on demand) and commits the JSON when it changes, which triggers a new deploy.
+The `Data refresh` workflow runs it every Monday (or on demand) and commits the JSON when it changes, which triggers a new deploy.
 
 > You can also use `npm` or `bun` if you prefer.
