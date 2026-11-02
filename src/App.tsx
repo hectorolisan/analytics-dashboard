@@ -2,12 +2,12 @@ import { Suspense, use, type ReactNode } from 'react'
 import { Dashboard } from './components/Dashboard'
 import { Evolution } from './components/Evolution'
 import { Seasonality } from './components/Seasonality'
-import { ExportButton, Filters } from './components/Filters'
+import { ExportButton, Filters, YearRange } from './components/Filters'
 import { OpenSidebarButton, Sidebar } from './components/Sidebar'
 import { ChartsSkeleton, DashboardSkeleton, Skeleton } from './components/Skeleton'
 import { ThemeControls } from './components/ThemeControls'
 import { loadDays, type Day } from './lib/data'
-import { PERIODS, SOURCE_FILTERS } from './lib/metrics'
+import { inYears, parsePeriod, SOURCE_FILTERS } from './lib/metrics'
 import { hashParams, parseRoute, SCREENS, setParams, useHash } from './lib/route'
 import { useSidebar } from './lib/sidebar'
 
@@ -17,7 +17,8 @@ export default function App() {
   const hash = useHash()
   const screen = parseRoute(hash)
   const params = hashParams(hash)
-  const period = PERIODS.find((p) => p.key === params.get('p')) ?? PERIODS[1]
+  const period = parsePeriod(params)
+  const [y0, y1] = [params.get('y0'), params.get('y1')]
   const sourceFilter = SOURCE_FILTERS.find((f) => f.key === params.get('f'))?.key ?? 'all'
   const title = SCREENS.find((s) => s.key === screen)!.title
   const sidebar = useSidebar()
@@ -40,7 +41,18 @@ export default function App() {
             <p className="text-xs text-muted-foreground">Red Eléctrica · Sistema peninsular</p>
           </div>
           {screen === 'resumen' && (
-            <Filters period={period} onPeriod={(p) => setParams({ p: p.key })} sourceFilter={sourceFilter} onSourceFilter={(f) => setParams({ f })} />
+            <Filters
+              period={period}
+              onPeriod={(p) => setParams({ p })}
+              onRange={setParams}
+              sourceFilter={sourceFilter}
+              onSourceFilter={(f) => setParams({ f })}
+            />
+          )}
+          {screen !== 'resumen' && (
+            <Suspense fallback={<Skeleton className="h-9 w-44" />}>
+              <YearRange data={daysPromise} from={y0} to={y1} onChange={setParams} />
+            </Suspense>
           )}
           <ThemeControls />
           {screen === 'resumen' && (
@@ -56,11 +68,11 @@ export default function App() {
             </Suspense>
           ) : screen === 'evolucion' ? (
             <Suspense fallback={<ChartsSkeleton />}>
-              <Loaded>{(days) => <Evolution days={days} />}</Loaded>
+              <Loaded select={(days) => inYears(days, y0, y1)}>{(days) => <Evolution days={days} />}</Loaded>
             </Suspense>
           ) : (
             <Suspense fallback={<ChartsSkeleton />}>
-              <Loaded>{(days) => <Seasonality days={days} />}</Loaded>
+              <Loaded select={(days) => inYears(days, y0, y1)}>{(days) => <Seasonality days={days} />}</Loaded>
             </Suspense>
           )}
         </main>
@@ -69,10 +81,11 @@ export default function App() {
   )
 }
 
-function Loaded({ children }: { children: (days: Day[]) => ReactNode }) {
+function Loaded({ children, select = (d) => d }: { children: (days: Day[]) => ReactNode; select?: (days: Day[]) => Day[] }) {
   const days = use(daysPromise)
   if (days instanceof Error) {
     return <p role="alert" className="card p-5 text-sm">{days.message}</p>
   }
-  return children(days)
+  const selected = select(days)
+  return selected.length ? children(selected) : <p role="alert" className="card p-5 text-sm">Sin datos en el rango elegido.</p>
 }

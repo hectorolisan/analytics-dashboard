@@ -4,9 +4,9 @@ import {
   bucketize,
   combine,
   pctChange,
+  periodDays,
   renewableShare,
   sourceRows,
-  splitPeriod,
   visibleSources,
   type Period,
   type SourceFilter,
@@ -21,11 +21,12 @@ type Props = { days: Day[]; period: Period; sourceFilter: SourceFilter }
 const pctDelta = (x: number) => formatSigned(formatPct(x), x)
 
 export function Dashboard({ days, period, sourceFilter }: Props) {
-  const { current, previous } = splitPeriod(days, period.days)
+  const { current, previous, bucket } = periodDays(days, period)
+  if (!current.length) return <p role="alert" className="card p-5 text-sm">Sin datos en el rango elegido.</p>
   const curr = combine(current)
   const prev = combine(previous)
-  const buckets = bucketize(current, period.bucket)
-  const prevBuckets = bucketize(previous, period.bucket)
+  const buckets = bucketize(current, bucket)
+  const prevBuckets = bucketize(previous, bucket)
 
   const share = renewableShare(curr)
   const shareDiff = share - renewableShare(prev)
@@ -72,8 +73,8 @@ export function Dashboard({ days, period, sourceFilter }: Props) {
           spark={buckets.map((d) => -d.exchange)}
         />
       </div>
-      <DemandChart current={buckets} previous={prevBuckets} total={formatEnergy(curr.demand)} bucket={period.bucket} />
-      <MixChart days={buckets} sources={visibleSources(sourceFilter)} bucket={period.bucket} />
+      <DemandChart current={buckets} previous={prevBuckets} total={formatEnergy(curr.demand)} bucket={bucket} />
+      <MixChart days={buckets} sources={visibleSources(sourceFilter)} bucket={bucket} />
       <SourcesTable rows={sourceRows(current, previous, sourceFilter)} />
     </div>
   )

@@ -12,7 +12,7 @@ export function Evolution({ days }: { days: Day[] }) {
   const partial = !last.endsWith('-12-31')
   const label = (y: Day) => y.date.slice(0, 4) + (partial && y.date.slice(0, 4) === last.slice(0, 4) ? '*' : '')
   const years = byYear(days)
-  const full = partial ? years.slice(0, -1) : years
+  const full = partial && years.length > 1 ? years.slice(0, -1) : years
 
   const mix = years.map((y) => ({ year: label(y), ...mixShares(y) }))
   const exchange = years.map((y) => {

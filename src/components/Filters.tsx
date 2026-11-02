@@ -2,7 +2,7 @@ import { ChevronDown, Download } from 'lucide-react'
 import { use } from 'react'
 import type { Day } from '../lib/data'
 import { download, toCsv } from '../lib/export'
-import { PERIODS, SOURCE_FILTERS, splitPeriod, visibleSources, type Period, type SourceFilter } from '../lib/metrics'
+import { PERIOD_OPTIONS, periodDays, SOURCE_FILTERS, visibleSources, type Period, type SourceFilter } from '../lib/metrics'
 import { controlClass } from './ThemeControls'
 
 type SelectProps<T extends string> = {
@@ -34,26 +34,53 @@ function Select<T extends string>({ label, value, options, onChange }: SelectPro
 
 type Props = {
   period: Period
-  onPeriod: (p: Period) => void
+  onPeriod: (key: Period['key']) => void
+  onRange: (range: { from?: string | null; to?: string | null }) => void
   sourceFilter: SourceFilter
   onSourceFilter: (f: SourceFilter) => void
 }
 
-export function Filters({ period, onPeriod, sourceFilter, onSourceFilter }: Props) {
+export function Filters({ period, onPeriod, onRange, sourceFilter, onSourceFilter }: Props) {
   return (
     <>
-      <Select
-        label="Periodo"
-        value={period.key}
-        options={PERIODS}
-        onChange={(k) => onPeriod(PERIODS.find((p) => p.key === k)!)}
-      />
+      <Select label="Periodo" value={period.key} options={PERIOD_OPTIONS} onChange={onPeriod} />
+      {period.key === 'custom' && (
+        <>
+          <DateInput label="Desde" value={period.from} onChange={(from) => onRange({ from })} />
+          <DateInput label="Hasta" value={period.to} onChange={(to) => onRange({ to })} />
+        </>
+      )}
       <Select label="Fuentes" value={sourceFilter} options={SOURCE_FILTERS} onChange={onSourceFilter} />
     </>
   )
 }
 
-export function ExportButton({ data, period, sourceFilter }: { data: Promise<Day[] | Error> } & Omit<Props, 'onPeriod' | 'onSourceFilter'>) {
+function DateInput({ label, value, onChange }: { label: string; value?: string; onChange: (v: string | null) => void }) {
+  return (
+    <label>
+      <span className="sr-only">{label}</span>
+      <input type="date" value={value ?? ''} onChange={(e) => onChange(e.target.value || null)} className={controlClass} />
+    </label>
+  )
+}
+
+type YearProps = { data: Promise<Day[] | Error>; from: string | null; to: string | null; onChange: (range: { y0?: string; y1?: string }) => void }
+
+export function YearRange({ data, from, to, onChange }: YearProps) {
+  const days = use(data)
+  if (days instanceof Error) return null
+  const years = [...new Set(days.map((d) => d.date.slice(0, 4)))].map((y) => ({ key: y, label: y }))
+  const y0 = from ?? years[0].key
+  const y1 = to ?? years.at(-1)!.key
+  return (
+    <>
+      <Select label="Desde" value={y0} options={years.filter((y) => y.key <= y1)} onChange={(y) => onChange({ y0: y })} />
+      <Select label="Hasta" value={y1} options={years.filter((y) => y.key >= y0)} onChange={(y) => onChange({ y1: y })} />
+    </>
+  )
+}
+
+export function ExportButton({ data, period, sourceFilter }: { data: Promise<Day[] | Error>; period: Period; sourceFilter: SourceFilter }) {
   const days = use(data)
   const ok = !(days instanceof Error)
   return (
@@ -62,7 +89,7 @@ export function ExportButton({ data, period, sourceFilter }: { data: Promise<Day
       disabled={!ok}
       onClick={() => {
         if (!ok) return
-        const { current } = splitPeriod(days, period.days)
+        const { current } = periodDays(days, period)
         download(`ree-${period.key}-${current.at(-1)?.date}.csv`, toCsv(current, visibleSources(sourceFilter)))
       }}
       className={`${controlClass} border-foreground bg-foreground text-background hover:bg-foreground/90 disabled:opacity-50`}

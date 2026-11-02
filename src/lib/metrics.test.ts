@@ -2,6 +2,9 @@ import { describe, expect, it } from 'vitest'
 import {
   averageBy,
   bucketize,
+  inYears,
+  parsePeriod,
+  periodDays,
   byYear,
   combine,
   mixShares,
@@ -104,5 +107,35 @@ describe('mixShares', () => {
     const s = mixShares(day('x', { hydro: -50 }))
     expect(s.hydro).toBe(0)
     expect(Object.values(s).reduce((a, b) => a + b, 0)).toBeCloseTo(1)
+  })
+})
+
+describe('parsePeriod / periodDays', () => {
+  const days = Array.from({ length: 10 }, (_, i) => day(`2026-01-${String(i + 1).padStart(2, '0')}`))
+
+  it('cae en 30 días si el periodo no existe', () => {
+    expect(parsePeriod(new URLSearchParams('p=nope')).key).toBe('30d')
+    expect(parsePeriod(new URLSearchParams('p=7d')).key).toBe('7d')
+  })
+
+  it('rango personalizado con su periodo anterior', () => {
+    const p = parsePeriod(new URLSearchParams('p=custom&from=2026-01-06&to=2026-01-08'))
+    const { current, previous, bucket } = periodDays(days, p)
+    expect(current.map((d) => d.date)).toEqual(['2026-01-06', '2026-01-07', '2026-01-08'])
+    expect(previous.map((d) => d.date)).toEqual(['2026-01-03', '2026-01-04', '2026-01-05'])
+    expect(bucket).toBe(1)
+  })
+
+  it('rango fuera de los datos queda vacío', () => {
+    const p = parsePeriod(new URLSearchParams('p=custom&from=2030-01-01&to=2030-02-01'))
+    expect(periodDays(days, p).current).toEqual([])
+  })
+})
+
+describe('inYears', () => {
+  it('filtra por años incluidos', () => {
+    const days = [day('2024-12-31'), day('2025-06-01'), day('2026-01-01')]
+    expect(inYears(days, '2025', '2025').map((d) => d.date)).toEqual(['2025-06-01'])
+    expect(inYears(days, null, '2025')).toHaveLength(2)
   })
 })

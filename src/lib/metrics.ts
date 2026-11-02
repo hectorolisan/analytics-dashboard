@@ -8,7 +8,31 @@ export const PERIODS = [
   { key: '5y', label: 'Últimos 5 años', days: 1820, bucket: 28 },
 ] as const
 
-export type Period = (typeof PERIODS)[number]
+export type Period = (typeof PERIODS)[number] | { key: 'custom'; label: string; from?: string; to?: string }
+
+export const PERIOD_OPTIONS = [...PERIODS, { key: 'custom', label: 'Personalizado' }] as const
+
+export function parsePeriod(params: URLSearchParams): Period {
+  if (params.get('p') === 'custom') {
+    return { key: 'custom', label: 'Personalizado', from: params.get('from') ?? undefined, to: params.get('to') ?? undefined }
+  }
+  return PERIODS.find((p) => p.key === params.get('p')) ?? PERIODS[1]
+}
+
+const bucketFor = (n: number) => (n <= 90 ? 1 : n <= 731 ? 7 : 28)
+
+/** Periodo actual, el anterior de igual longitud y el tamaño de agregación. Sin `from`, 30 días. */
+export function periodDays(days: Day[], p: Period) {
+  if (p.key !== 'custom') return { ...splitPeriod(days, p.days), bucket: p.bucket }
+  const end = p.to ? days.filter((d) => d.date <= p.to!) : days
+  const n = p.from ? end.filter((d) => d.date >= p.from!).length : 30
+  // n = 0 haría slice(-0) = todo
+  return n ? { ...splitPeriod(end, n), bucket: bucketFor(n) } : { current: [], previous: [], bucket: 1 }
+}
+
+/** Días entre dos años (incluidos); sin límite si falta. */
+export const inYears = (days: Day[], y0?: string | null, y1?: string | null) =>
+  days.filter((d) => (!y0 || d.date >= y0) && (!y1 || d.date.slice(0, 4) <= y1))
 export type SourceFilter = 'all' | 'renewable' | 'fossil'
 
 export const SOURCE_FILTERS: { key: SourceFilter; label: string }[] = [

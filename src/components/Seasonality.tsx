@@ -22,18 +22,19 @@ const MONTHS = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', '
 const axis = { tickLine: false, axisLine: false, tick: { fill: 'var(--muted-foreground)', fontSize: 11 } } as const
 
 export function Seasonality({ days }: { days: Day[] }) {
-  const recent = days.slice(-364)
-  const decadeAgo = days.slice(-364 - 3640, -3640)
-  const now = averageBy(recent, 7, weekday, (d) => d.demand)
-  const then = averageBy(decadeAgo, 7, weekday, (d) => d.demand)
+  const now = averageBy(days.slice(-364), 7, weekday, (d) => d.demand)
+  const then = averageBy(days.slice(0, 364), 7, weekday, (d) => d.demand)
   const weekRows = WEEKDAYS.map((label, i) => ({ label, now: now[i], then: then[i] }))
+  const firstYear = days[0].date.slice(0, 4)
 
-  // últimos 3 años completos para un perfil estable
-  const lastYear = Number(days.at(-1)!.date.slice(0, 4)) - 1
-  const profileDays = days.filter((d) => {
+  // últimos 3 años completos del rango para un perfil estable; si no hay, todo el rango
+  const last = days.at(-1)!.date
+  const lastYear = Number(last.slice(0, 4)) - (last.endsWith('-12-31') ? 0 : 1)
+  const fullYears = days.filter((d) => {
     const y = Number(d.date.slice(0, 4))
     return y > lastYear - 3 && y <= lastYear
   })
+  const profileDays = fullYears.length ? fullYears : days
   const solar = averageBy(profileDays, 12, month, (d) => d.solar)
   const wind = averageBy(profileDays, 12, month, (d) => d.wind)
   const monthRows = MONTHS.map((label, i) => ({ label, solar: solar[i], wind: wind[i] }))
@@ -46,7 +47,7 @@ export function Seasonality({ days }: { days: Day[] }) {
           <header className="mb-4 flex flex-wrap items-center gap-x-5 gap-y-2">
             <div className="mr-auto">
               <h2 className="text-lg">Demanda por día de la semana</h2>
-              <p className="text-xs text-muted-foreground">GWh/día de media, último año frente a hace 10 años</p>
+              <p className="text-xs text-muted-foreground">GWh/día de media, último año frente al primero del rango</p>
             </div>
             <ul className="flex gap-4 text-xs text-muted-foreground">
               <li className="flex items-center gap-1.5">
@@ -55,7 +56,7 @@ export function Seasonality({ days }: { days: Day[] }) {
               </li>
               <li className="flex items-center gap-1.5">
                 <span className="size-2 rounded-sm bg-muted-foreground/50" aria-hidden />
-                Hace 10 años
+                {firstYear}
               </li>
             </ul>
           </header>
@@ -69,7 +70,7 @@ export function Seasonality({ days }: { days: Day[] }) {
             />
             <Bar name="Último año" dataKey="now" fill="var(--primary)" maxBarSize={20} radius={[4, 4, 0, 0]} animationDuration={900} />
             <Bar
-              name="Hace 10 años"
+              name={firstYear}
               dataKey="then"
               fill="var(--muted-foreground)"
               fillOpacity={0.5}
@@ -86,7 +87,7 @@ export function Seasonality({ days }: { days: Day[] }) {
             <div className="mr-auto">
               <h2 className="text-lg">Solar frente a eólica</h2>
               <p className="text-xs text-muted-foreground">
-                GWh/día de media por mes, {lastYear - 2}–{lastYear}
+                GWh/día de media por mes, {profileDays[0].date.slice(0, 4)}–{profileDays.at(-1)!.date.slice(0, 4)}
               </p>
             </div>
             <ul className="flex gap-4 text-xs text-muted-foreground">
