@@ -84,6 +84,12 @@
   * {
     @apply border-border;
   }
+  /* Tailwind 4 deja cursor: default en botones */
+  button:not(:disabled),
+  [role="button"]:not(:disabled),
+  select:not(:disabled) {
+    cursor: pointer;
+  }
   body {
     @apply bg-background text-foreground font-sans antialiased;
   }
