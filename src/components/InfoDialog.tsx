@@ -1,5 +1,6 @@
 import { ExternalLink, Info, X } from 'lucide-react'
 import { useRef, type ReactNode } from 'react'
+import { Credit } from './Credit'
 
 const link = 'inline-flex items-center gap-1 font-medium text-primary underline-offset-4 hover:underline'
 
@@ -10,12 +11,11 @@ export function InfoButton({ className = '' }: { className?: string }) {
     <>
       <button
         type="button"
-        title="Sobre los datos"
         onClick={() => ref.current?.showModal()}
-        className={`grid size-10 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-primary sm:size-9 ${className}`}
+        className={className}
       >
-        <Info className="size-4" />
-        <span className="sr-only">Sobre los datos</span>
+        <Info className="size-4 shrink-0" aria-hidden />
+        Sobre los datos
       </button>
       <dialog
         ref={ref}
@@ -91,7 +91,9 @@ export function InfoButton({ className = '' }: { className?: string }) {
             </ul>
           </Block>
 
-          <p className="border-t pt-4 text-xs text-muted-foreground">Diseño y desarrollo · Héctor Olivares Sánchez</p>
+          <footer className="border-t pt-4">
+            <Credit />
+          </footer>
         </div>
       </dialog>
     </>

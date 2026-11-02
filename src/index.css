@@ -65,6 +65,7 @@
   --color-bad: var(--bad);
   --font-sans: "Poppins", system-ui, sans-serif;
   --font-heading: "Bricolage Grotesque", system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, monospace;
   --animate-cell-in: cell-in 500ms ease-out both;
 
   @keyframes cell-in {
