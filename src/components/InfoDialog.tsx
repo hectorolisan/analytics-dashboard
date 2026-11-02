@@ -4,18 +4,19 @@ import { Credit } from './Credit'
 
 const link = 'inline-flex items-center gap-1 font-medium text-primary underline-offset-4 hover:underline'
 
-export function InfoButton({ className = '' }: { className?: string }) {
+export function InfoButton({ className = '', labelClassName = '' }: { className?: string; labelClassName?: string }) {
   const ref = useRef<HTMLDialogElement>(null)
 
   return (
     <>
       <button
         type="button"
+        title="Sobre los datos"
         onClick={() => ref.current?.showModal()}
         className={className}
       >
         <Info className="size-4 shrink-0" aria-hidden />
-        Sobre los datos
+        <span className={labelClassName}>Sobre los datos</span>
       </button>
       <dialog
         ref={ref}

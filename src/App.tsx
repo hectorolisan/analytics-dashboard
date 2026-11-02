@@ -31,7 +31,7 @@ export default function App() {
       />
       <div className="min-w-0 flex-1">
         <header className="sticky top-0 z-10 flex flex-wrap items-center gap-2 border-b bg-background/80 px-4 py-3 backdrop-blur sm:px-6">
-          <OpenSidebarButton open={sidebar.open} onToggle={sidebar.toggle} />
+          <OpenSidebarButton onToggle={sidebar.toggle} />
           <div className="mr-auto">
             <h1 className="text-xl">{title}</h1>
             <p className="text-xs text-muted-foreground">Red Eléctrica · Sistema peninsular</p>
