@@ -5,6 +5,7 @@ import {
   combine,
   pctChange,
   renewableShare,
+  sourceRows,
   splitPeriod,
   visibleSources,
   type Period,
@@ -13,6 +14,7 @@ import {
 import { DemandChart } from './DemandChart'
 import { KpiCard } from './KpiCard'
 import { MixChart } from './MixChart'
+import { SourcesTable } from './SourcesTable'
 
 type Props = { days: Day[]; period: Period; sourceFilter: SourceFilter }
 
@@ -68,6 +70,7 @@ export function Dashboard({ days, period, sourceFilter }: Props) {
       </div>
       <DemandChart current={buckets} previous={prevBuckets} total={formatEnergy(curr.demand)} bucket={period.bucket} />
       <MixChart days={buckets} sources={visibleSources(sourceFilter)} bucket={period.bucket} />
+      <SourcesTable rows={sourceRows(current, previous, sourceFilter)} />
     </div>
   )
 }
