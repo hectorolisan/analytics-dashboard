@@ -1,32 +1,35 @@
-# React + TypeScript + Vite
+# Dashboard · Red Eléctrica
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Panel de análisis de la demanda y la generación eléctrica peninsular (2008–2026) con KPIs, gráficos animados, filtros y tabla ordenable.
 
-Currently, two official plugins are available:
+**Stack:** React 19 · TypeScript · Vite · Tailwind CSS 4 · Recharts 3 · TanStack Table 9 · Vitest
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Datos
 
-## React Compiler
+[`daniel-dona/ree-data`](https://huggingface.co/datasets/daniel-dona/ree-data) (CC BY 4.0, datos abiertos de REE): 1,9 M registros cada 5 min, agregados por día en `public/data/ree-daily.json`.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Energías en GWh/día, pico en MW.
+- `exchange < 0` = exportación neta.
+- Antes de 2015 REE agrupa solar térmica, biomasa y cogeneración en «régimen especial» (`aut`); aquí cuenta como «Cogeneración y otras», así que la cuota renovable de esos años está infraestimada.
 
-## Expanding the Oxlint configuration
+Regenerar:
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+python -m venv .venv
+.venv/Scripts/python -m pip install -r requirements.txt
+.venv/Scripts/python scripts/build_dataset.py
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+## Scripts
+
+```bash
+pnpm install
+pnpm dev
+pnpm test
+pnpm build
+pnpm lint
+```
+
+## Tema
+
+Light/dark y color primario elegible entre la paleta de Tailwind (teal por defecto), guardados en `localStorage`. Tipografías: Bricolage Grotesque (títulos) y Poppins (texto).
