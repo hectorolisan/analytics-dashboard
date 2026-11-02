@@ -2,6 +2,12 @@
 
 Panel de análisis de la demanda y la generación eléctrica peninsular (2008–2026) con KPIs, gráficos animados, filtros y tabla ordenable.
 
+Pantallas:
+
+- **Resumen:** KPIs con sparklines, demanda frente al periodo anterior (área), mix de generación (área apilada) y tabla de fuentes.
+- **Evolución:** mix anual en columnas apiladas al 100 % y saldo internacional en barras divergentes.
+- **Estacionalidad:** heatmap mes × año (demanda o cuota renovable), barras por día de la semana y radar solar frente a eólica.
+
 **Stack:** React 19 · TypeScript · Vite · Tailwind CSS 4 · Recharts 3 · TanStack Table 9 · Vitest
 
 ## Datos
