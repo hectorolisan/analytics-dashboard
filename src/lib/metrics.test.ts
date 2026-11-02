@@ -1,5 +1,18 @@
 import { describe, expect, it } from 'vitest'
-import { bucketize, combine, pctChange, renewableShare, sourceRows, splitPeriod, visibleSources } from './metrics'
+import {
+  averageBy,
+  bucketize,
+  byYear,
+  combine,
+  mixShares,
+  monthlyCells,
+  pctChange,
+  renewableShare,
+  sourceRows,
+  splitPeriod,
+  visibleSources,
+  weekday,
+} from './metrics'
 import { day } from './test-utils'
 
 describe('combine', () => {
@@ -52,5 +65,44 @@ describe('sourceRows', () => {
   it('las cuotas de todas las fuentes suman 1', () => {
     const total = sourceRows([day('a')], [], 'all').reduce((s, r) => s + r.share, 0)
     expect(total).toBeCloseTo(1)
+  })
+})
+
+describe('byYear / monthlyCells', () => {
+  const days = [day('2025-12-31', { demand: 300 }), day('2026-01-01'), day('2026-01-02', { demand: 200 }), day('2026-02-01')]
+
+  it('agrupa por año natural', () => {
+    expect(byYear(days).map((y) => [y.date, y.demand])).toEqual([
+      ['2025-12-31', 300],
+      ['2026-01-01', 400],
+    ])
+  })
+
+  it('calcula la media diaria por mes', () => {
+    expect(monthlyCells(days).map((c) => [c.ym, c.demand])).toEqual([
+      ['2025-12', 300],
+      ['2026-01', 150],
+      ['2026-02', 100],
+    ])
+  })
+})
+
+describe('averageBy / weekday', () => {
+  it('lunes es 0 y domingo 6', () => {
+    expect(weekday(day('2026-05-11'))).toBe(0)
+    expect(weekday(day('2026-05-17'))).toBe(6)
+  })
+
+  it('promedia por índice y deja 0 donde no hay datos', () => {
+    const avg = averageBy([day('2026-05-11', { demand: 100 }), day('2026-05-18', { demand: 300 })], 7, weekday, (d) => d.demand)
+    expect(avg).toEqual([200, 0, 0, 0, 0, 0, 0])
+  })
+})
+
+describe('mixShares', () => {
+  it('suma 1 e ignora el bombeo negativo', () => {
+    const s = mixShares(day('x', { hydro: -50 }))
+    expect(s.hydro).toBe(0)
+    expect(Object.values(s).reduce((a, b) => a + b, 0)).toBeCloseTo(1)
   })
 })
