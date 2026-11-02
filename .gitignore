@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 .venv
 data/raw
+
+# Claude Code
+.claude
