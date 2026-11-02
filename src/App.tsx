@@ -55,11 +55,9 @@ export default function App() {
             </Suspense>
           )}
           <ThemeControls />
-          {screen === 'resumen' && (
-            <Suspense fallback={<Skeleton className="h-9 w-28" />}>
-              <ExportButton data={daysPromise} period={period} sourceFilter={sourceFilter} />
-            </Suspense>
-          )}
+          <Suspense fallback={<Skeleton className="h-9 w-28" />}>
+            <ExportButton data={daysPromise} screen={screen} period={period} sourceFilter={sourceFilter} y0={y0} y1={y1} />
+          </Suspense>
         </header>
         <main className="mx-auto max-w-7xl p-4 sm:p-6">
           {screen === 'resumen' ? (

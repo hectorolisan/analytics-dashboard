@@ -16,6 +16,7 @@ import { compact, formatEnergy } from '../lib/format'
 import { averageBy, monthlyCells, month, weekday } from '../lib/metrics'
 import { ChartTooltip } from './ChartTooltip'
 import { Heatmap } from './Heatmap'
+import { SaveImage } from './SaveImage'
 
 const WEEKDAYS = ['lun', 'mar', 'mié', 'jue', 'vie', 'sáb', 'dom']
 const MONTHS = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic']
@@ -59,6 +60,7 @@ export function Seasonality({ days }: { days: Day[] }) {
                 {firstYear}
               </li>
             </ul>
+            <SaveImage name="demanda-dia-semana" />
           </header>
           <BarChart responsive style={{ width: '100%', height: 260 }} data={weekRows} barGap={2} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
             <CartesianGrid vertical={false} stroke="var(--grid)" />
@@ -100,6 +102,7 @@ export function Seasonality({ days }: { days: Day[] }) {
                 Eólica
               </li>
             </ul>
+            <SaveImage name="solar-eolica" />
           </header>
           <RadarChart responsive style={{ width: '100%', height: 260 }} data={monthRows} outerRadius="75%">
             <PolarGrid stroke="var(--grid)" />

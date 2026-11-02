@@ -4,6 +4,7 @@ import type { EventMark } from '../lib/events'
 import { bucketLabel, compact, formatDate, formatEnergy } from '../lib/format'
 import type { visibleSources } from '../lib/metrics'
 import { ChartTooltip } from './ChartTooltip'
+import { SaveImage } from './SaveImage'
 import { eventLines } from './EventLines'
 import { SourceLegend } from './SourceLegend'
 
@@ -15,9 +16,12 @@ export function MixChart({ days, sources, bucket, marks }: Props) {
 
   return (
     <section className="card p-5">
-      <header className="mb-4">
-        <h2 className="text-lg">Mix de generación</h2>
-        <p className="text-xs text-muted-foreground">GWh por {bucketLabel(bucket)}, apilado por fuente</p>
+      <header className="mb-4 flex items-start gap-3">
+        <div className="mr-auto">
+          <h2 className="text-lg">Mix de generación</h2>
+          <p className="text-xs text-muted-foreground">GWh por {bucketLabel(bucket)}, apilado por fuente</p>
+        </div>
+        <SaveImage name="mix-generacion" />
       </header>
       <AreaChart responsive style={{ width: '100%', height: 280 }} data={rows} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
         <CartesianGrid vertical={false} stroke="var(--grid)" />

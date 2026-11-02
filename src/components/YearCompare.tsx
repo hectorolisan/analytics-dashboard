@@ -5,6 +5,7 @@ import { compact, METRICS, MONTHS, type Metric } from '../lib/format'
 import { monthlyCells } from '../lib/metrics'
 import { hashParams, setParams, useHash } from '../lib/route'
 import { ChartTooltip } from './ChartTooltip'
+import { SaveImage } from './SaveImage'
 import { Select } from './Filters'
 import { Segmented } from './Heatmap'
 
@@ -39,6 +40,7 @@ export function YearCompare({ days }: { days: Day[] }) {
           <span className="size-2 rounded-sm bg-primary" aria-hidden />
           <Select label="Año B" value={b} options={years} onChange={(y) => setParams({ b: y })} />
         </span>
+        <SaveImage name="comparativa-anual" />
       </header>
       <LineChart responsive style={{ width: '100%', height: 280 }} data={rows} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
         <CartesianGrid vertical={false} stroke="var(--grid)" />

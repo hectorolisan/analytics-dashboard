@@ -3,6 +3,7 @@ import { SOURCES, sourceColor, type Day } from '../lib/data'
 import { compact, formatDate, formatEnergy, formatPct } from '../lib/format'
 import { byYear, mixShares, renewableShare } from '../lib/metrics'
 import { ChartTooltip } from './ChartTooltip'
+import { SaveImage } from './SaveImage'
 import { SourceLegend } from './SourceLegend'
 import { YearCompare } from './YearCompare'
 
@@ -24,12 +25,15 @@ export function Evolution({ days }: { days: Day[] }) {
   return (
     <div className="space-y-4">
       <section className="card p-5">
-        <header className="mb-4">
-          <h2 className="text-lg">Mix anual de generación</h2>
-          <p className="text-xs text-muted-foreground">
-            Cuota renovable: {full[0].date.slice(0, 4)} {formatPct(renewableShare(full[0]))} → {full.at(-1)!.date.slice(0, 4)}{' '}
-            {formatPct(renewableShare(full.at(-1)!))}
-          </p>
+        <header className="mb-4 flex items-start gap-3">
+          <div className="mr-auto">
+            <h2 className="text-lg">Mix anual de generación</h2>
+            <p className="text-xs text-muted-foreground">
+              Cuota renovable: {full[0].date.slice(0, 4)} {formatPct(renewableShare(full[0]))} → {full.at(-1)!.date.slice(0, 4)}{' '}
+              {formatPct(renewableShare(full.at(-1)!))}
+            </p>
+          </div>
+          <SaveImage name="mix-anual" />
         </header>
         <BarChart responsive style={{ width: '100%', height: 320 }} data={mix} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
           <CartesianGrid vertical={false} stroke="var(--grid)" />
@@ -74,6 +78,7 @@ export function Evolution({ days }: { days: Day[] }) {
               Importador
             </li>
           </ul>
+          <SaveImage name="saldo-internacional" />
         </header>
         <BarChart
           responsive

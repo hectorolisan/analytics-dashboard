@@ -4,6 +4,7 @@ import { bucketLabel, compact, formatDate, formatEnergy } from '../lib/format'
 import type { Day } from '../lib/data'
 import type { EventMark } from '../lib/events'
 import { ChartTooltip } from './ChartTooltip'
+import { SaveImage } from './SaveImage'
 import { eventLines } from './EventLines'
 
 type Row = { date: string; prevDate?: string; current: number; previous?: number }
@@ -38,6 +39,7 @@ export function DemandChart({ current, previous, total, bucket, marks }: Props) 
           </li>
         </ul>
         <p className="ml-auto font-heading text-lg font-extrabold">{total}</p>
+        <SaveImage name="demanda" />
       </header>
       <AreaChart responsive style={{ width: '100%', height: 280 }} data={rows} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
         <defs>

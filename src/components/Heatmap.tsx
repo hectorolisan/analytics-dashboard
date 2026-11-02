@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { eventIn } from '../lib/events'
+import { SaveImage } from './SaveImage'
 import { formatDate, METRICS, MONTHS, type Metric } from '../lib/format'
 import type { monthlyCells } from '../lib/metrics'
 
@@ -32,6 +33,7 @@ export function Heatmap({ cells }: { cells: Cell[] }) {
           </p>
         </div>
         <Segmented label="Métrica" value={metric} options={METRICS} onChange={setMetric} />
+        <SaveImage name="calendario-mensual" />
       </header>
 
       <div

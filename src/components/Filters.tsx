@@ -1,8 +1,9 @@
 import { ChevronDown, Download } from 'lucide-react'
 import { use } from 'react'
 import type { Day } from '../lib/data'
-import { download, toCsv } from '../lib/export'
-import { PERIOD_OPTIONS, periodDays, SOURCE_FILTERS, visibleSources, type Period, type SourceFilter } from '../lib/metrics'
+import { download, screenRows, toCsv } from '../lib/export'
+import { PERIOD_OPTIONS, SOURCE_FILTERS, type Period, type SourceFilter } from '../lib/metrics'
+import type { Screen } from '../lib/route'
 import { controlClass } from './ThemeControls'
 
 type SelectProps<T extends string> = {
@@ -80,17 +81,18 @@ export function YearRange({ data, from, to, onChange }: YearProps) {
   )
 }
 
-export function ExportButton({ data, period, sourceFilter }: { data: Promise<Day[] | Error>; period: Period; sourceFilter: SourceFilter }) {
+type ExportProps = { data: Promise<Day[] | Error>; screen: Screen } & Parameters<typeof screenRows>[2]
+
+export function ExportButton({ data, screen, ...view }: ExportProps) {
   const days = use(data)
-  const ok = !(days instanceof Error)
+  const { rows, sources } = days instanceof Error ? { rows: [], sources: [] } : screenRows(days, screen, view)
+  const ok = rows.length > 0
   return (
     <button
       type="button"
       disabled={!ok}
       onClick={() => {
-        if (!ok) return
-        const { current } = periodDays(days, period)
-        download(`ree-${period.key}-${current.at(-1)?.date}.csv`, toCsv(current, visibleSources(sourceFilter)))
+        if (ok) download(`ree-${screen}-${rows[0].date}_${rows.at(-1)!.date}.csv`, toCsv(rows, sources))
       }}
       className={`${controlClass} border-foreground bg-foreground text-background hover:bg-foreground/90 disabled:opacity-50`}
     >
