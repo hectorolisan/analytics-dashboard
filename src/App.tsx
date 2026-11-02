@@ -1,6 +1,7 @@
 import { Suspense, use, useState, type ReactNode } from 'react'
 import { Dashboard } from './components/Dashboard'
 import { Evolution } from './components/Evolution'
+import { Seasonality } from './components/Seasonality'
 import { ExportButton, Filters } from './components/Filters'
 import { Sidebar } from './components/Sidebar'
 import { ChartsSkeleton, DashboardSkeleton, Skeleton } from './components/Skeleton'
@@ -46,7 +47,9 @@ export default function App() {
               <Loaded>{(days) => <Evolution days={days} />}</Loaded>
             </Suspense>
           ) : (
-            <ChartsSkeleton />
+            <Suspense fallback={<ChartsSkeleton />}>
+              <Loaded>{(days) => <Seasonality days={days} />}</Loaded>
+            </Suspense>
           )}
         </main>
       </div>

@@ -36,15 +36,42 @@ export function bucketize(days: Day[], size: number): Day[] {
   return out
 }
 
-/** Agrupa días consecutivos con la misma clave (año 'YYYY', mes 'YYYY-MM'). */
-export function groupBy(days: Day[], key: (d: Day) => string): Day[] {
+/** Agrupa días con la misma clave (año 'YYYY', mes 'YYYY-MM'), en orden de aparición. */
+export function groupDays(days: Day[], key: (d: Day) => string): Day[][] {
   const groups = new Map<string, Day[]>()
-  for (const d of days) groups.set(key(d), [...(groups.get(key(d)) ?? []), d])
-  return [...groups.values()].map(combine)
+  for (const d of days) {
+    const k = key(d)
+    if (!groups.has(k)) groups.set(k, [])
+    groups.get(k)!.push(d)
+  }
+  return [...groups.values()]
 }
 
-export const byYear = (days: Day[]) => groupBy(days, (d) => d.date.slice(0, 4))
-export const byMonth = (days: Day[]) => groupBy(days, (d) => d.date.slice(0, 7))
+export const byYear = (days: Day[]) => groupDays(days, (d) => d.date.slice(0, 4)).map(combine)
+
+/** Media diaria de demanda y cuota renovable por mes natural. */
+export function monthlyCells(days: Day[]) {
+  return groupDays(days, (d) => d.date.slice(0, 7)).map((g) => {
+    const c = combine(g)
+    return { ym: c.date.slice(0, 7), demand: c.demand / g.length, renewable: renewableShare(c) }
+  })
+}
+
+/** Media de value(d) por índice (día de la semana, mes del año…). */
+export function averageBy(days: Day[], n: number, index: (d: Day) => number, value: (d: Day) => number) {
+  const sum = Array<number>(n).fill(0)
+  const count = Array<number>(n).fill(0)
+  for (const d of days) {
+    const i = index(d)
+    sum[i] += value(d)
+    count[i]++
+  }
+  return sum.map((s, i) => (count[i] ? s / count[i] : 0))
+}
+
+/** 0 = lunes … 6 = domingo */
+export const weekday = (d: Day) => (new Date(d.date).getUTCDay() + 6) % 7
+export const month = (d: Day) => Number(d.date.slice(5, 7)) - 1
 
 /** Cuota de cada fuente sobre la generación (0–1); hidráulica negativa cuenta como 0. */
 export function mixShares(d: Day) {
