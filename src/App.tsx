@@ -3,12 +3,13 @@ import { Dashboard } from './components/Dashboard'
 import { Evolution } from './components/Evolution'
 import { Seasonality } from './components/Seasonality'
 import { ExportButton, Filters } from './components/Filters'
-import { Sidebar } from './components/Sidebar'
+import { OpenSidebarButton, Sidebar } from './components/Sidebar'
 import { ChartsSkeleton, DashboardSkeleton, Skeleton } from './components/Skeleton'
 import { ThemeControls } from './components/ThemeControls'
 import { loadDays, type Day } from './lib/data'
 import { PERIODS, type SourceFilter } from './lib/metrics'
 import { SCREENS, useRoute } from './lib/route'
+import { useSidebar } from './lib/sidebar'
 
 const daysPromise: Promise<Day[] | Error> = loadDays().catch((e: Error) => e)
 
@@ -17,12 +18,20 @@ export default function App() {
   const [period, setPeriod] = useState<(typeof PERIODS)[number]>(PERIODS[1])
   const [sourceFilter, setSourceFilter] = useState<SourceFilter>('all')
   const title = SCREENS.find((s) => s.key === screen)!.title
+  const sidebar = useSidebar()
 
   return (
     <div className="flex min-h-dvh">
-      <Sidebar screen={screen} />
-      <div className="min-w-0 flex-1 pb-14 sm:pb-0">
+      <Sidebar
+        screen={screen}
+        open={sidebar.open}
+        mobileOpen={sidebar.mobileOpen}
+        onToggle={sidebar.toggle}
+        onNavigate={sidebar.closeMobile}
+      />
+      <div className="min-w-0 flex-1">
         <header className="sticky top-0 z-10 flex flex-wrap items-center gap-2 border-b bg-background/80 px-4 py-3 backdrop-blur sm:px-6">
+          <OpenSidebarButton open={sidebar.open} onToggle={sidebar.toggle} />
           <div className="mr-auto">
             <h1 className="text-xl">{title}</h1>
             <p className="text-xs text-muted-foreground">Red Eléctrica · Sistema peninsular</p>

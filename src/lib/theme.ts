@@ -9,7 +9,7 @@ export type Mode = 'light' | 'dark'
 // tonos claros: texto oscuro encima para mantener contraste
 const BRIGHT = new Set<PrimaryColor>(['amber', 'yellow', 'lime'])
 
-function read(key: string) {
+export function read(key: string) {
   try {
     return localStorage.getItem(key)
   } catch {
@@ -17,7 +17,7 @@ function read(key: string) {
   }
 }
 
-function write(key: string, value: string) {
+export function write(key: string, value: string) {
   try {
     localStorage.setItem(key, value)
   } catch {
