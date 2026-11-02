@@ -11,6 +11,9 @@ export const SOURCES = [
 
 export type SourceKey = (typeof SOURCES)[number]['key']
 
+// el color sigue a la fuente, no a su posición tras filtrar
+export const sourceColor = (key: SourceKey) => `var(--series-${SOURCES.findIndex((s) => s.key === key) + 1})`
+
 /** Energías en GWh/día, pico en MW. exchange < 0 = exportación neta. */
 export type Day = { date: string; demand: number; peak: number; exchange: number } & Record<SourceKey, number>
 

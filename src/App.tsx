@@ -1,12 +1,17 @@
-import { Suspense, use } from 'react'
+import { Suspense, use, useState } from 'react'
+import { Dashboard } from './components/Dashboard'
 import { Sidebar } from './components/Sidebar'
 import { DashboardSkeleton } from './components/Skeleton'
 import { ThemeControls } from './components/ThemeControls'
 import { loadDays, type Day } from './lib/data'
+import { PERIODS, type SourceFilter } from './lib/metrics'
 
 const daysPromise: Promise<Day[] | Error> = loadDays().catch((e: Error) => e)
 
 export default function App() {
+  const [period] = useState(PERIODS[1])
+  const [sourceFilter] = useState<SourceFilter>('all')
+
   return (
     <div className="flex min-h-dvh">
       <Sidebar />
@@ -18,9 +23,9 @@ export default function App() {
           </div>
           <ThemeControls />
         </header>
-        <main id="resumen" className="mx-auto max-w-7xl p-4 sm:p-6">
+        <main id="resumen" className="mx-auto max-w-7xl scroll-mt-20 p-4 sm:p-6">
           <Suspense fallback={<DashboardSkeleton />}>
-            <Dashboard />
+            <Loaded period={period} sourceFilter={sourceFilter} />
           </Suspense>
         </main>
       </div>
@@ -28,10 +33,10 @@ export default function App() {
   )
 }
 
-function Dashboard() {
+function Loaded(props: Omit<Parameters<typeof Dashboard>[0], 'days'>) {
   const days = use(daysPromise)
   if (days instanceof Error) {
     return <p role="alert" className="card p-5 text-sm">{days.message}</p>
   }
-  return <p className="card p-5 text-sm">{days.length} días cargados</p>
+  return <Dashboard days={days} {...props} />
 }
