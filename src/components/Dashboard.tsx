@@ -1,5 +1,5 @@
 import type { Day } from '../lib/data'
-import { formatEnergy, formatPct, formatPower, formatSigned } from '../lib/format'
+import { formatDate, formatEnergy, formatPct, formatPower, formatSigned } from '../lib/format'
 import {
   bucketize,
   combine,
@@ -34,6 +34,10 @@ export function Dashboard({ days, period, sourceFilter }: Props) {
 
   return (
     <div className="space-y-4">
+      <p className="text-xs font-semibold tracking-[0.3em] text-muted-foreground uppercase">
+        {formatDate(current[0].date, 'long')} – {formatDate(current.at(-1)!.date, 'long')}
+        <span className="sr-only">, comparado con el periodo anterior</span>
+      </p>
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <KpiCard
           label="Demanda"
