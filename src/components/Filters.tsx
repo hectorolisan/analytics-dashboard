@@ -4,7 +4,7 @@ import type { Day } from '../lib/data'
 import { download, screenRows, toCsv } from '../lib/export'
 import { PERIOD_OPTIONS, SOURCE_FILTERS, type Period, type SourceFilter } from '../lib/metrics'
 import type { Screen } from '../lib/route'
-import { controlClass } from './ThemeControls'
+import { controlBase, controlClass } from './ThemeControls'
 
 type SelectProps<T extends string> = {
   label: string
@@ -94,7 +94,7 @@ export function ExportButton({ data, screen, ...view }: ExportProps) {
       onClick={() => {
         if (ok) download(`ree-${screen}-${rows[0].date}_${rows.at(-1)!.date}.csv`, toCsv(rows, sources))
       }}
-      className={`${controlClass} border-foreground bg-foreground text-background hover:bg-foreground/90 disabled:opacity-50`}
+      className={`${controlBase} border-foreground bg-foreground text-background hover:bg-foreground/85 disabled:opacity-50`}
     >
       <Download className="size-4" aria-hidden />
       Exportar

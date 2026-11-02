@@ -2,8 +2,10 @@ import { Check, Moon, Palette, Sun } from 'lucide-react'
 import { useState } from 'react'
 import { applyMode, applyPrimary, PRIMARY_COLORS, storedMode, storedPrimary } from '../lib/theme'
 
-export const controlClass =
-  'inline-flex h-9 items-center gap-2 rounded-lg border bg-card px-3 text-sm font-medium transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-primary'
+export const controlBase =
+  'inline-flex h-9 items-center gap-2 rounded-lg border px-3 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-primary'
+
+export const controlClass = `${controlBase} bg-card hover:bg-muted`
 
 export function ThemeControls() {
   const [mode, setMode] = useState(storedMode)
