@@ -16,9 +16,9 @@ const item = (active = false) =>
 const ghost =
   'grid size-8 shrink-0 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-primary'
 
-type Props = { screen: Screen; open: boolean; mobileOpen: boolean; onToggle: () => void; onNavigate: () => void }
+type Props = { screen: Screen; query?: string; open: boolean; mobileOpen: boolean; onToggle: () => void; onNavigate: () => void }
 
-export function Sidebar({ screen, open, mobileOpen, onToggle, onNavigate }: Props) {
+export function Sidebar({ screen, query, open, mobileOpen, onToggle, onNavigate }: Props) {
   return (
     <>
       {mobileOpen && <div className="fixed inset-0 z-30 bg-black/50 backdrop-blur-sm sm:hidden" onClick={onNavigate} aria-hidden />}
@@ -57,7 +57,7 @@ export function Sidebar({ screen, open, mobileOpen, onToggle, onNavigate }: Prop
               return (
                 <a
                   key={key}
-                  href={`#/${key}`}
+                  href={`#/${key}${query ? `?${query}` : ''}`}
                   title={title}
                   onClick={onNavigate}
                   aria-current={key === screen ? 'page' : undefined}

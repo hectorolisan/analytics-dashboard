@@ -1,4 +1,4 @@
-import { Suspense, use, useState, type ReactNode } from 'react'
+import { Suspense, use, type ReactNode } from 'react'
 import { Dashboard } from './components/Dashboard'
 import { Evolution } from './components/Evolution'
 import { Seasonality } from './components/Seasonality'
@@ -7,16 +7,18 @@ import { OpenSidebarButton, Sidebar } from './components/Sidebar'
 import { ChartsSkeleton, DashboardSkeleton, Skeleton } from './components/Skeleton'
 import { ThemeControls } from './components/ThemeControls'
 import { loadDays, type Day } from './lib/data'
-import { PERIODS, type SourceFilter } from './lib/metrics'
-import { SCREENS, useRoute } from './lib/route'
+import { PERIODS, SOURCE_FILTERS } from './lib/metrics'
+import { hashParams, parseRoute, SCREENS, setParams, useHash } from './lib/route'
 import { useSidebar } from './lib/sidebar'
 
 const daysPromise: Promise<Day[] | Error> = loadDays().catch((e: Error) => e)
 
 export default function App() {
-  const screen = useRoute()
-  const [period, setPeriod] = useState<(typeof PERIODS)[number]>(PERIODS[1])
-  const [sourceFilter, setSourceFilter] = useState<SourceFilter>('all')
+  const hash = useHash()
+  const screen = parseRoute(hash)
+  const params = hashParams(hash)
+  const period = PERIODS.find((p) => p.key === params.get('p')) ?? PERIODS[1]
+  const sourceFilter = SOURCE_FILTERS.find((f) => f.key === params.get('f'))?.key ?? 'all'
   const title = SCREENS.find((s) => s.key === screen)!.title
   const sidebar = useSidebar()
 
@@ -24,6 +26,7 @@ export default function App() {
     <div className="flex min-h-dvh">
       <Sidebar
         screen={screen}
+        query={hash.split('?')[1]}
         open={sidebar.open}
         mobileOpen={sidebar.mobileOpen}
         onToggle={sidebar.toggle}
@@ -37,7 +40,7 @@ export default function App() {
             <p className="text-xs text-muted-foreground">Red Eléctrica · Sistema peninsular</p>
           </div>
           {screen === 'resumen' && (
-            <Filters period={period} onPeriod={setPeriod} sourceFilter={sourceFilter} onSourceFilter={setSourceFilter} />
+            <Filters period={period} onPeriod={(p) => setParams({ p: p.key })} sourceFilter={sourceFilter} onSourceFilter={(f) => setParams({ f })} />
           )}
           <ThemeControls />
           {screen === 'resumen' && (
