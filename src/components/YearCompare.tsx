@@ -14,7 +14,7 @@ const axis = { tickLine: false, axisLine: false, tick: { fill: 'var(--muted-fore
 export function YearCompare({ days }: { days: Day[] }) {
   const params = hashParams(useHash())
   const [metric, setMetric] = useState<Metric>('demand')
-  const { format } = METRICS.find((m) => m.key === metric)!
+  const { format, label } = METRICS.find((m) => m.key === metric)!
   const cells = monthlyCells(days)
   const years = [...new Set(cells.map((c) => c.ym.slice(0, 4)))].map((y) => ({ key: y, label: y }))
   const pick = (name: string, fallback: string) => years.find((y) => y.key === params.get(name))?.key ?? fallback
@@ -42,7 +42,7 @@ export function YearCompare({ days }: { days: Day[] }) {
         </span>
         <SaveImage name="comparativa-anual" />
       </header>
-      <LineChart responsive style={{ width: '100%', height: 280 }} data={rows} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+      <LineChart responsive title="Comparativa anual" desc={`${label} mensual de ${a} frente a ${b}.`} style={{ width: '100%', height: 280 }} data={rows} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
         <CartesianGrid vertical={false} stroke="var(--grid)" />
         <XAxis dataKey="label" {...axis} />
         <YAxis

@@ -13,7 +13,7 @@ import {
 } from 'recharts'
 import { sourceColor, type Day } from '../lib/data'
 import { compact, formatEnergy } from '../lib/format'
-import { averageBy, monthlyCells, month, weekday } from '../lib/metrics'
+import { averageBy, mean, monthlyCells, month, weekday } from '../lib/metrics'
 import { ChartTooltip } from './ChartTooltip'
 import { Heatmap } from './Heatmap'
 import { SaveImage } from './SaveImage'
@@ -62,7 +62,12 @@ export function Seasonality({ days }: { days: Day[] }) {
             </ul>
             <SaveImage name="demanda-dia-semana" />
           </header>
-          <BarChart responsive style={{ width: '100%', height: 260 }} data={weekRows} barGap={2} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+          <BarChart
+            responsive
+            title="Demanda por día de la semana"
+            desc={`Media de ${formatEnergy(mean(now))}/día en el último año frente a ${formatEnergy(mean(then))}/día en ${firstYear}.`}
+            style={{ width: '100%', height: 260 }}
+            data={weekRows} barGap={2} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
             <CartesianGrid vertical={false} stroke="var(--grid)" />
             <XAxis dataKey="label" {...axis} />
             <YAxis {...axis} width={40} tickFormatter={(v: number) => compact.format(v)} />
@@ -104,7 +109,11 @@ export function Seasonality({ days }: { days: Day[] }) {
             </ul>
             <SaveImage name="solar-eolica" />
           </header>
-          <RadarChart responsive style={{ width: '100%', height: 260 }} data={monthRows} outerRadius="75%">
+          <RadarChart
+            responsive
+            title="Solar frente a eólica"
+            desc={`Más solar en ${MONTHS[solar.indexOf(Math.max(...solar))]}; más eólica en ${MONTHS[wind.indexOf(Math.max(...wind))]}.`}
+            style={{ width: '100%', height: 260 }} data={monthRows} outerRadius="75%">
             <PolarGrid stroke="var(--grid)" />
             <PolarAngleAxis dataKey="label" tick={{ fill: 'var(--muted-foreground)', fontSize: 11 }} />
             <PolarRadiusAxis tick={false} axisLine={false} />

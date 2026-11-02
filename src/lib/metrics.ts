@@ -93,6 +93,8 @@ export function averageBy(days: Day[], n: number, index: (d: Day) => number, val
   return sum.map((s, i) => (count[i] ? s / count[i] : 0))
 }
 
+export const mean = (xs: number[]) => xs.reduce((a, b) => a + b, 0) / (xs.length || 1)
+
 /** 0 = lunes … 6 = domingo */
 export const weekday = (d: Day) => (new Date(d.date).getUTCDay() + 6) % 7
 export const month = (d: Day) => Number(d.date.slice(5, 7)) - 1

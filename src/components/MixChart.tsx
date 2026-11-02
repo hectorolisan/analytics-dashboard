@@ -13,6 +13,8 @@ type Props = { days: Day[]; sources: ReturnType<typeof visibleSources>; bucket: 
 export function MixChart({ days, sources, bucket, marks }: Props) {
   // shortcut: hidráulica neta < 0 (bombeo) se apila como 0; el valor real está en la tabla
   const rows = days.map((d) => ({ ...d, hydro: Math.max(0, d.hydro) }))
+  const total = (key: (typeof sources)[number]['key']) => rows.reduce((s, d) => s + d[key], 0)
+  const top = sources.reduce((m, s) => (total(s.key) > total(m.key) ? s : m))
 
   return (
     <section className="card p-5">
@@ -23,7 +25,7 @@ export function MixChart({ days, sources, bucket, marks }: Props) {
         </div>
         <SaveImage name="mix-generacion" />
       </header>
-      <AreaChart responsive style={{ width: '100%', height: 280 }} data={rows} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+      <AreaChart responsive title="Mix de generación" desc={`Fuente principal: ${top.label}.`} style={{ width: '100%', height: 280 }} data={rows} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
         <CartesianGrid vertical={false} stroke="var(--grid)" />
         <XAxis
           dataKey="date"

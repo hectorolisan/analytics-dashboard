@@ -19,6 +19,7 @@ export function DemandChart({ current, previous, total, bucket, marks }: Props) 
     current: d.demand,
     previous: previous[i]?.demand,
   }))
+  const peak = rows.reduce((m, r) => (r.current > m.current ? r : m))
   const tick = (iso: string) => formatDate(iso, bucket >= 28 ? 'month' : 'short')
 
   return (
@@ -41,7 +42,12 @@ export function DemandChart({ current, previous, total, bucket, marks }: Props) 
         <p className="ml-auto font-heading text-lg font-extrabold">{total}</p>
         <SaveImage name="demanda" />
       </header>
-      <AreaChart responsive style={{ width: '100%', height: 280 }} data={rows} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+      <AreaChart
+        responsive
+        title="Demanda en el tiempo"
+        desc={`Total ${total}. Máximo de ${formatEnergy(peak.current)} el ${formatDate(peak.date, 'long')}.`}
+        style={{ width: '100%', height: 280 }}
+        data={rows} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
         <defs>
           <linearGradient id={id} x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="var(--primary)" stopOpacity={0.22} />

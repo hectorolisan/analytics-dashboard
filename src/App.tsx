@@ -1,4 +1,5 @@
 import { lazy, Suspense, use, type ReactNode } from 'react'
+import { ErrorBoundary } from './components/ErrorBoundary'
 import { ExportButton, Filters, YearRange } from './components/Filters'
 import { OpenSidebarButton, Sidebar } from './components/Sidebar'
 import { ChartsSkeleton, DashboardSkeleton, Skeleton } from './components/Skeleton'
@@ -61,19 +62,21 @@ export default function App() {
           </Suspense>
         </header>
         <main className="mx-auto max-w-7xl p-4 sm:p-6">
-          {screen === 'resumen' ? (
-            <Suspense fallback={<DashboardSkeleton />}>
-              <Loaded>{(days) => <Dashboard days={days} period={period} sourceFilter={sourceFilter} />}</Loaded>
-            </Suspense>
-          ) : screen === 'evolucion' ? (
-            <Suspense fallback={<ChartsSkeleton />}>
-              <Loaded select={(days) => inYears(days, y0, y1)}>{(days) => <Evolution days={days} />}</Loaded>
-            </Suspense>
-          ) : (
-            <Suspense fallback={<ChartsSkeleton />}>
-              <Loaded select={(days) => inYears(days, y0, y1)}>{(days) => <Seasonality days={days} />}</Loaded>
-            </Suspense>
-          )}
+          <ErrorBoundary key={screen}>
+            {screen === 'resumen' ? (
+              <Suspense fallback={<DashboardSkeleton />}>
+                <Loaded>{(days) => <Dashboard days={days} period={period} sourceFilter={sourceFilter} />}</Loaded>
+              </Suspense>
+            ) : screen === 'evolucion' ? (
+              <Suspense fallback={<ChartsSkeleton />}>
+                <Loaded select={(days) => inYears(days, y0, y1)}>{(days) => <Evolution days={days} />}</Loaded>
+              </Suspense>
+            ) : (
+              <Suspense fallback={<ChartsSkeleton />}>
+                <Loaded select={(days) => inYears(days, y0, y1)}>{(days) => <Seasonality days={days} />}</Loaded>
+              </Suspense>
+            )}
+          </ErrorBoundary>
         </main>
       </div>
     </div>

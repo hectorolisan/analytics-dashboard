@@ -35,7 +35,12 @@ export function Evolution({ days }: { days: Day[] }) {
           </div>
           <SaveImage name="mix-anual" />
         </header>
-        <BarChart responsive style={{ width: '100%', height: 320 }} data={mix} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+        <BarChart
+          responsive
+          title="Mix anual de generación"
+          desc={`Cuota renovable de ${formatPct(renewableShare(full[0]))} en ${full[0].date.slice(0, 4)} a ${formatPct(renewableShare(full.at(-1)!))} en ${full.at(-1)!.date.slice(0, 4)}.`}
+          style={{ width: '100%', height: 320 }}
+          data={mix} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
           <CartesianGrid vertical={false} stroke="var(--grid)" />
           <XAxis dataKey="year" {...axis} axisLine={{ stroke: 'var(--border)' }} interval="preserveStartEnd" minTickGap={8} />
           <YAxis {...axis} axisLine={false} width={44} domain={[0, 1]} ticks={[0, 0.25, 0.5, 0.75, 1]} tickFormatter={(v: number) => `${v * 100} %`} />
@@ -82,6 +87,8 @@ export function Evolution({ days }: { days: Day[] }) {
         </header>
         <BarChart
           responsive
+          title="Saldo internacional"
+          desc={`Exportador neto en ${exchange.filter((r) => r.net > 0).length} de ${exchange.length} años.`}
           style={{ width: '100%', height: 280 }}
           data={exchange}
           stackOffset="sign"
