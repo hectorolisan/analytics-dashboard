@@ -1,5 +1,6 @@
 import { CalendarDays, ChartColumnStacked, LayoutGrid, Zap } from 'lucide-react'
 import { SCREENS, type Screen } from '../lib/route'
+import { InfoButton } from './InfoDialog'
 
 const ICONS = { resumen: LayoutGrid, evolucion: ChartColumnStacked, estacionalidad: CalendarDays }
 
@@ -29,12 +30,7 @@ export function Sidebar({ screen }: { screen: Screen }) {
           )
         })}
       </nav>
-      <div
-        className="mt-auto hidden size-9 place-items-center rounded-full bg-primary text-xs font-semibold text-primary-foreground sm:grid"
-        title="Héctor Olivares Sánchez"
-      >
-        HO
-      </div>
+      <InfoButton className="ml-2 sm:mt-auto sm:ml-0" />
     </aside>
   )
 }
