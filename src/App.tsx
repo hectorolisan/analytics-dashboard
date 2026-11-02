@@ -1,5 +1,6 @@
 import { Suspense, use, useState, type ReactNode } from 'react'
 import { Dashboard } from './components/Dashboard'
+import { Evolution } from './components/Evolution'
 import { ExportButton, Filters } from './components/Filters'
 import { Sidebar } from './components/Sidebar'
 import { ChartsSkeleton, DashboardSkeleton, Skeleton } from './components/Skeleton'
@@ -39,6 +40,10 @@ export default function App() {
           {screen === 'resumen' ? (
             <Suspense fallback={<DashboardSkeleton />}>
               <Loaded>{(days) => <Dashboard days={days} period={period} sourceFilter={sourceFilter} />}</Loaded>
+            </Suspense>
+          ) : screen === 'evolucion' ? (
+            <Suspense fallback={<ChartsSkeleton />}>
+              <Loaded>{(days) => <Evolution days={days} />}</Loaded>
             </Suspense>
           ) : (
             <ChartsSkeleton />

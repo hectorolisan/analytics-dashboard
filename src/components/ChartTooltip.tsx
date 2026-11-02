@@ -9,7 +9,7 @@ type Props<T> = Partial<TooltipContentProps<number, string>> & {
 
 export function ChartTooltip<T>({ active, payload, title, format, reverse }: Props<T>) {
   if (!active || !payload?.length) return null
-  const items = reverse ? payload.toReversed() : payload
+  const items = (reverse ? payload.toReversed() : payload).filter((p) => p.value !== 0)
   return (
     <div className="card min-w-44 px-3 py-2 text-xs shadow-md">
       <p className="mb-1.5 font-semibold">{title(payload[0].payload as T)}</p>

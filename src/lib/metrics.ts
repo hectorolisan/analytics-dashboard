@@ -36,6 +36,23 @@ export function bucketize(days: Day[], size: number): Day[] {
   return out
 }
 
+/** Agrupa días consecutivos con la misma clave (año 'YYYY', mes 'YYYY-MM'). */
+export function groupBy(days: Day[], key: (d: Day) => string): Day[] {
+  const groups = new Map<string, Day[]>()
+  for (const d of days) groups.set(key(d), [...(groups.get(key(d)) ?? []), d])
+  return [...groups.values()].map(combine)
+}
+
+export const byYear = (days: Day[]) => groupBy(days, (d) => d.date.slice(0, 4))
+export const byMonth = (days: Day[]) => groupBy(days, (d) => d.date.slice(0, 7))
+
+/** Cuota de cada fuente sobre la generación (0–1); hidráulica negativa cuenta como 0. */
+export function mixShares(d: Day) {
+  const pos = { ...d, hydro: Math.max(0, d.hydro) }
+  const gen = generation(pos)
+  return Object.fromEntries(SOURCES.map((s) => [s.key, gen ? pos[s.key] / gen : 0])) as Record<SourceKey, number>
+}
+
 /** Periodo actual (últimos n días) y el inmediatamente anterior. */
 export function splitPeriod(days: Day[], n: number) {
   return { current: days.slice(-n), previous: days.slice(-2 * n, -n) }
