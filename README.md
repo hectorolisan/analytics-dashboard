@@ -1,14 +1,16 @@
 # Analytics Dashboard (Red Eléctrica)
 
 Analytics dashboard for the **Spanish peninsular power grid**: demand, generation mix and international exchanges from 2008 to 2026.
-Dense data at a glance: KPI row with sparklines, animated charts, filters, sortable table and loading skeletons.
+Dense data at a glance: KPI row with sparklines, animated charts, shareable filters in the URL, CSV/PNG export, sortable table and offline support.
 
 - **Vite 8** + **React 19** + **TypeScript 7** — static SPA, no backend.
 - **Recharts 3** — area, stacked area, stacked 100 % bar, diverging bar, grouped bar and radar charts.
 - **TanStack Table 9** — sortable sources table.
 - **Tailwind CSS 4** — shadcn/ui-style tokens, light/dark mode and selectable primary color (teal by default).
 - **DuckDB** (Python) — aggregates the raw dataset into a daily JSON.
-- **Vitest** + **Testing Library** — unit and component tests.
+- **vite-plugin-pwa** — installable, works offline with the dataset precached.
+- **Fontsource** — self-hosted fonts; **modern-screenshot** — PNG export of each chart.
+- **Vitest** + **Testing Library** — unit and component tests; **Playwright** — end-to-end tests on the production build.
 - **pnpm** — package manager.
 
 > Live demo: [hectorolisan.github.io/analytics-dashboard](https://hectorolisan.github.io/analytics-dashboard/)
@@ -19,9 +21,14 @@ Dense data at a glance: KPI row with sparklines, animated charts, filters, sorta
 
 | Screen         | Charts                                                                                          |
 | :------------- | :---------------------------------------------------------------------------------------------- |
-| Resumen        | KPIs with sparklines, demand vs previous period, generation mix, sources table, CSV export      |
-| Evolución      | Yearly generation mix (100 % stacked bars), yearly international balance (diverging bars)       |
+| Resumen        | KPIs with sparklines, demand vs previous period, generation mix, sources table                  |
+| Evolución      | Yearly generation mix (100 % stacked bars), yearly international balance, year vs year comparison |
 | Estacionalidad | Month × year heatmap (demand / renewable share), demand by weekday, solar vs wind radar         |
+
+- **Filters** live in the URL hash (`#/resumen?p=custom&from=…&to=…`, `#/evolucion?y0=2015&y1=2025&a=2015&b=2025`), so every view can be shared or bookmarked.
+- **Resumen** offers fixed periods or a custom date range, always compared with the previous span of equal length. **Evolución** and **Estacionalidad** filter by year range.
+- **Events** (lockdown 2020, storm Filomena, 2025 blackout) are marked on the time charts and the heatmap.
+- **Export**: CSV of what each screen shows and a PNG button on every chart.
 
 ## Dataset
 
@@ -55,33 +62,41 @@ Dense data at a glance: KPI row with sparklines, animated charts, filters, sorta
 │   │   ├── Credit.tsx          # Footer credit
 │   │   ├── Dashboard.tsx       # Resumen screen
 │   │   ├── DemandChart.tsx     # Demand vs previous period
+│   │   ├── ErrorBoundary.tsx   # Per-screen render error fallback
+│   │   ├── EventLines.tsx      # Event reference lines
 │   │   ├── Evolution.tsx       # Evolución screen
-│   │   ├── Filters.tsx         # Period / source filters + CSV export
-│   │   ├── Heatmap.tsx         # Month × year heatmap
+│   │   ├── Filters.tsx         # Period, date/year range, source filters + CSV export
+│   │   ├── Heatmap.tsx         # Month × year heatmap + Segmented control
 │   │   ├── InfoDialog.tsx      # Dataset info dialog
 │   │   ├── KpiCard.tsx         # KPI + sparkline
 │   │   ├── MixChart.tsx        # Stacked generation mix
+│   │   ├── SaveImage.tsx       # PNG download of the enclosing chart card
 │   │   ├── Seasonality.tsx     # Estacionalidad screen
 │   │   ├── Sidebar.tsx         # Collapsible sidebar (icon rail on desktop, sheet on mobile)
 │   │   ├── Skeleton.tsx        # Loading skeletons
 │   │   ├── SourceLegend.tsx
 │   │   ├── SourcesTable.tsx    # TanStack Table
-│   │   └── ThemeControls.tsx   # Light/dark + primary color picker
+│   │   ├── ThemeControls.tsx   # Light/dark + primary color picker
+│   │   └── YearCompare.tsx     # Year vs year monthly comparison
 │   ├── lib/
 │   │   ├── data.ts             # Day type, sources, loader
-│   │   ├── export.ts           # CSV export
+│   │   ├── events.ts           # Annotated events
+│   │   ├── export.ts           # CSV rows per screen + downloads
 │   │   ├── format.ts           # es-ES number/date formatting
 │   │   ├── metrics.ts          # Periods, buckets, shares, averages
-│   │   ├── route.ts            # Hash routing
+│   │   ├── route.ts            # Hash routing + URL params
 │   │   ├── sidebar.ts          # Sidebar state + Ctrl+B
 │   │   └── theme.ts            # Theme + primary color persistence
 │   ├── App.tsx
 │   ├── index.css               # Tailwind + design tokens
 │   └── main.tsx
+├── .github/workflows/      # CI, monthly data refresh, Pages deploy
+├── e2e/                        # Playwright specs
 ├── AGENTS.md
 ├── index.html
 ├── LICENSE
 ├── package.json
+├── playwright.config.ts
 ├── requirements.txt            # Python deps for the dataset script
 ├── vite.config.ts
 └── README.md
@@ -93,10 +108,11 @@ Dense data at a glance: KPI row with sparklines, animated charts, filters, sorta
 | :------------- | :---------------------------------------- |
 | `pnpm install` | Install all dependencies                  |
 | `pnpm dev`     | Start dev server at `localhost:5173`      |
-| `pnpm build`   | Type-check and build into `./dist/`, deployed to GitHub Pages on push to `main` |
+| `pnpm build`   | Type-check and build into `./dist/` (deployed to GitHub Pages after CI passes on `main`) |
 | `pnpm preview` | Preview the production build              |
 | `pnpm lint`    | Run Oxlint                                |
 | `pnpm test`    | Run Vitest                                |
+| `pnpm test:e2e` | Build, serve and run Playwright (`pnpm exec playwright install chromium` once) |
 
 ### Regenerate the dataset
 
@@ -107,5 +123,7 @@ source .venv/bin/activate     # Linux/macOS
 pip install -r requirements.txt
 python scripts/build_dataset.py
 ```
+
+The `Data refresh` workflow runs this monthly (or on demand) and commits the JSON when it changes, which triggers a new deploy.
 
 > You can also use `npm` or `bun` if you prefer.

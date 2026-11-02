@@ -7,8 +7,9 @@ This file provides guidance to coding agents when working with code in this repo
 **Analytics Dashboard (Red Eléctrica)** shows demand, generation mix and international exchanges of
 the Spanish peninsular power grid (2008–2026). Static SPA: Vite 8 + React 19 + TypeScript 7 +
 Tailwind CSS 4 + Recharts 3 + TanStack Table 9, no backend. All visible content is in Spanish.
-Vitest covers `src/lib` (pure metrics, theme, export, routing, sidebar hook) and `SourcesTable`
-(`*.test.ts(x)`, jsdom by default); chart components are untested.
+Vitest covers `src/lib` (pure metrics, theme, export, routing, events, sidebar hook), `SourcesTable`
+and `ErrorBoundary` (`*.test.ts(x)`, jsdom by default). Charts are covered end to end by Playwright
+(`e2e/`, excluded from Vitest).
 
 ## Commands
 
@@ -19,9 +20,12 @@ pnpm is the package manager (`pnpm-lock.yaml` is committed; npm/bun also work).
 - `pnpm build` — `tsc -b && vite build` into `./dist/` (test files are type-checked too)
 - `pnpm lint` — Oxlint (`.oxlintrc.json`)
 - `pnpm test` — Vitest (`vitest run`; config lives in `vite.config.ts`, `environment: 'jsdom'`)
+- `pnpm test:e2e` — Playwright: builds, runs `vite preview` on :4173 and tests the production bundle
+  (service worker included); needs `pnpm exec playwright install chromium` once
 
-Deploy: `.github/workflows/deploy.yml` publishes `./dist/` to GitHub Pages on every push to `main`
-(lint + test first). Vite's `base` comes from `PAGES_BASE_PATH` (`/analytics-dashboard` in CI,
+CI: `ci.yml` runs lint, Vitest and Playwright on pushes and PRs. `deploy.yml` publishes `./dist/` to
+GitHub Pages after a successful `CI` or `Data refresh` run on `main` (`workflow_run`, since pushes made
+with `GITHUB_TOKEN` start no workflows). `data.yml` rebuilds the dataset monthly and commits it. Vite's `base` comes from `PAGES_BASE_PATH` (`/analytics-dashboard` in CI,
 empty locally), so build asset and data URLs from `import.meta.env.BASE_URL`, never hardcode `/…`.
 `packageManager` in `package.json` pins the pnpm version CI uses.
 
@@ -35,7 +39,8 @@ Never edit that JSON by hand; `src/lib/dataset.test.ts` checks column lengths an
 `src/main.tsx` applies the stored primary color and renders `App`. `App.tsx` owns the layout
 (sidebar, sticky header, screen switch), the period / source filter state and a module-level
 `daysPromise` read with React 19 `use()` inside `<Suspense>` (skeleton fallbacks), so the JSON is
-fetched once for every screen. Screens: `Dashboard` (Resumen), `Evolution`, `Seasonality`.
+fetched once for every screen. Screens: `Dashboard` (Resumen), `Evolution`, `Seasonality`, loaded
+with `React.lazy` and wrapped in an `ErrorBoundary` keyed by screen.
 
 Patterns that span files:
 
@@ -67,14 +72,25 @@ Patterns that span files:
   `useTable` + `createColumnHelper<typeof features, Row>()` + `<table.FlexRender>`. The v8 API
   (`useReactTable`, `getCoreRowModel`) does not exist here.
 - **Navigation**: hash routes (`#/resumen`, `#/evolucion`, `#/estacionalidad`) via
-  `useSyncExternalStore` in `lib/route.ts`; no router dependency. Filters and CSV export only show
-  on Resumen.
+  `useSyncExternalStore` in `lib/route.ts`; no router dependency. Filter state lives in the hash
+  query (`#/resumen?p=30d&f=renewable`): read it with `hashParams(useHash())`, write it with
+  `setParams()` (`location.replace`, so filters don't fill the history). Resumen uses `p`, `f`,
+  `from`, `to` (`parsePeriod` / `periodDays`); Evolución and Estacionalidad use `y0`, `y1`
+  (`inYears`) and the comparison `a`, `b`. Sidebar links keep the query. CSV export shows on every
+  screen (`screenRows` in `lib/export.ts`).
 - **Sidebar** (`lib/sidebar.ts` + `components/Sidebar.tsx`): desktop collapses to an icon rail
   (`w-16`, labels hidden with `group-data-[open=false]/sidebar`), state persisted; mobile is an
   overlay sheet closed on navigation, backdrop click or Esc. `Ctrl/Cmd+B` toggles both.
-- **Brand**: fonts from Google Fonts in `index.html` — Poppins (`font-sans`), Bricolage Grotesque
-  800 (`font-heading`, h1–h3), Geist Mono (`font-mono`, credit only). Section labels are uppercase
+- **Brand**: self-hosted Fontsource fonts imported in `main.tsx` — Poppins 400/500/600 latin
+  (`font-sans`), Bricolage Grotesque Variable with `opsz` (`font-heading`, h1–h3), Geist Mono latin
+  (`font-mono`, credit only). Section labels are uppercase
   with `tracking-[0.3em]`. `Credit.tsx` is shared with other hectorolisan projects; keep it as is.
+- **Chart extras**: every chart card is a `<section>` whose header holds `<SaveImage name>`
+  (modern-screenshot, imported on demand; nodes with `data-no-export` are skipped). Recharts charts
+  get `title` and a `desc` with their key fact for screen readers. Events in `lib/events.ts` are
+  drawn with `eventLines(eventMarks(...))` and outlined in the heatmap.
+- **PWA**: `vite-plugin-pwa` (`autoUpdate`) precaches `js, css, html, svg, woff2, json`, dataset
+  included; the service worker only exists in the production build.
 - **Info dialog**: native `<dialog>` with `showModal()`, scrollable body and fixed credit footer.
   Keep its dataset facts in sync with `README.md` and `scripts/build_dataset.py`.
 
